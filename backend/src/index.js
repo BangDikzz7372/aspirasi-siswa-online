@@ -471,10 +471,12 @@ export default {
       }, 404);
 
     } catch (error) {
-      return response({
-        success: false,
-        message: "Terjadi kesalahan pada server."
-      }, 500);
+  console.error("BACKEND ERROR:", error);
+
+  return response({
+    success: false,
+    message: "Terjadi kesalahan pada server."
+  }, 500);
     }
   }
 };
