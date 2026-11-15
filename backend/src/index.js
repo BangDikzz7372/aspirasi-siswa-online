@@ -488,8 +488,9 @@ if (
     "Selesai"
   ];
 
-  const status = url.searchParams.get("status");
-  const requestedPage = Number.parseInt(
+  
+const status = url.searchParams.get("status");
+const requestedPage = Number.parseInt(
   url.searchParams.get("page") || "1",
   10
 );
@@ -498,15 +499,15 @@ const page = Math.min(
   100000,
   Math.max(1, Number.isSafeInteger(requestedPage) ? requestedPage : 1)
 );
-  );
 
-  const limit = Math.min(
-    50,
-    Math.max(
-      1,
-      Number.parseInt(url.searchParams.get("limit") || "20", 10) || 20
-    )
-  );
+const limit = Math.min(
+  50,
+  Math.max(
+    1,
+    Number.parseInt(url.searchParams.get("limit") || "20", 10) || 20
+  )
+);
+  
 
   if (status && !allowedStatuses.includes(status)) {
     return response({
