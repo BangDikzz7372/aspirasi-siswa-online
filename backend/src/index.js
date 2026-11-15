@@ -6,7 +6,7 @@ const corsHeaders = {
     "Content-Type, Authorization, X-Admin-Setup-Key"
 };
 
-const PBKDF2_ITERATIONS = 310000;
+const PBKDF2_ITERATIONS = 100000;
 const SESSION_HOURS = 12;
 
 function response(data, status = 200) {
