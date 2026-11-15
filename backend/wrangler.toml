@@ -2,3 +2,8 @@
 name = "aspirasi-siswa-api"
 main = "src/index.js"
 compatibility_date = "2026-11-15"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aspirasi-siswa-db"
+database_id = "4ae21245-b0d9-4f78-be9b-6b4b8330d01d"
