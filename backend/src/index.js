@@ -197,7 +197,8 @@ export default {
           SELECT sender_type, message, visibility, created_at
           FROM aspiration_messages
           WHERE aspiration_id = ?
-          ORDER BY created_at ASC, id ASC
+AND visibility = 'public'
+ORDER BY created_at ASC, id ASC
         `).bind(aspiration.id).all();
 
         return response({
