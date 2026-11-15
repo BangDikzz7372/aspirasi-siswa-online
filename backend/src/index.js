@@ -2,8 +2,12 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type"
+  "Access-Control-Allow-Headers":
+    "Content-Type, Authorization, X-Admin-Setup-Key"
 };
+
+const PBKDF2_ITERATIONS = 310000;
+const SESSION_HOURS = 12;
 
 function response(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -16,20 +20,28 @@ function response(data, status = 200) {
   });
 }
 
+function randomBytesHex(length = 32) {
+  const bytes = crypto.getRandomValues(new Uint8Array(length));
+  return Array.from(bytes, b =>
+    b.toString(16).padStart(2, "0")
+  ).join("");
+}
+
 function randomCode(length = 12) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const bytes = crypto.getRandomValues(new Uint8Array(length));
-
-  return Array.from(bytes, b => chars[b % chars.length]).join("");
+  return Array.from(bytes, b =>
+    chars[b % chars.length]
+  ).join("");
 }
 
-async function hashPin(pin) {
-  const data = new TextEncoder().encode(pin);
+async function sha256(value) {
+  const data = new TextEncoder().encode(value);
   const hash = await crypto.subtle.digest("SHA-256", data);
 
-  return Array.from(new Uint8Array(hash))
-    .map(b => b.toString(16).padStart(2, "0"))
-    .join("");
+  return Array.from(new Uint8Array(hash), b =>
+    b.toString(16).padStart(2, "0")
+  ).join("");
 }
 
 function safeEqual(a, b) {
@@ -48,30 +60,275 @@ function safeEqual(a, b) {
   return result === 0;
 }
 
+async function hashPassword(password) {
+  const salt = randomBytesHex(16);
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: new TextEncoder().encode(salt),
+      iterations: PBKDF2_ITERATIONS,
+      hash: "SHA-256"
+    },
+    key,
+    256
+  );
+
+  const hash = Array.from(new Uint8Array(bits), b =>
+    b.toString(16).padStart(2, "0")
+  ).join("");
+
+  return `pbkdf2$${PBKDF2_ITERATIONS}$${salt}$${hash}`;
+}
+
+async function verifyPassword(password, stored) {
+  try {
+    const [algorithm, iterationsText, salt, expected] =
+      stored.split("$");
+
+    if (algorithm !== "pbkdf2") return false;
+
+    const iterations = Number(iterationsText);
+
+    if (
+      !Number.isInteger(iterations) ||
+      iterations < 100000 ||
+      iterations > 1000000
+    ) {
+      return false;
+    }
+
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+
+    const bits = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: new TextEncoder().encode(salt),
+        iterations,
+        hash: "SHA-256"
+      },
+      key,
+      256
+    );
+
+    const actual = Array.from(new Uint8Array(bits), b =>
+      b.toString(16).padStart(2, "0")
+    ).join("");
+
+    return safeEqual(actual, expected);
+  } catch {
+    return false;
+  }
+}
+
+async function getAdmin(request, env) {
+  const authorization = request.headers.get("Authorization") || "";
+  const match = authorization.match(/^Bearer ([a-f0-9]{64})$/i);
+
+  if (!match) return null;
+
+  const tokenHash = await sha256(match[1]);
+
+  const session = await env.DB.prepare(`
+    SELECT admins.id, admins.username
+    FROM admin_sessions
+    JOIN admins ON admins.id = admin_sessions.admin_id
+    WHERE admin_sessions.token_hash = ?
+      AND admin_sessions.expires_at > CURRENT_TIMESTAMP
+  `).bind(tokenHash).first();
+
+  return session || null;
+}
+
+async function hashPin(pin) {
+  return sha256(pin);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
 
-    if (request.method === "OPTIONS") {
+    if (method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // STATUS BACKEND
-    if (url.pathname === "/api/status" && request.method === "GET") {
-      return response({
-        success: true,
-        project: "Aspirasi Siswa Online",
-        status: "Backend aktif",
-        version: "1.2.0"
-      });
-    }
+    try {
+      // STATUS BACKEND
+      if (path === "/api/status" && method === "GET") {
+        return response({
+          success: true,
+          project: "Aspirasi Siswa Online",
+          status: "Backend aktif",
+          version: "2.0.0"
+        });
+      }
 
-    // KIRIM ASPIRASI
-    if (
-      url.pathname === "/api/aspirations" &&
-      request.method === "POST"
-    ) {
-      try {
+      // PEMBUATAN ADMIN PERTAMA
+      if (path === "/api/admin/setup" && method === "POST") {
+        const setupKey = request.headers.get("X-Admin-Setup-Key");
+
+        if (
+          !env.ADMIN_SETUP_KEY ||
+          !safeEqual(setupKey, env.ADMIN_SETUP_KEY)
+        ) {
+          return response({
+            success: false,
+            message: "Kunci setup tidak valid."
+          }, 403);
+        }
+
+        const body = await request.json();
+        const username = String(body.username || "").trim();
+        const password = String(body.password || "");
+
+        if (!/^[a-zA-Z0-9_.-]{3,30}$/.test(username)) {
+          return response({
+            success: false,
+            message: "Username harus 3–30 karakter dan hanya boleh berisi huruf, angka, titik, garis bawah, atau tanda hubung."
+          }, 400);
+        }
+
+        if (password.length < 12 || password.length > 128) {
+          return response({
+            success: false,
+            message: "Password harus 12–128 karakter."
+          }, 400);
+        }
+
+        const passwordHash = await hashPassword(password);
+
+        const result = await env.DB.prepare(`
+          INSERT INTO admins (username, password_hash)
+          SELECT ?, ?
+          WHERE NOT EXISTS (SELECT 1 FROM admins)
+        `).bind(username, passwordHash).run();
+
+        if (!result.meta || result.meta.changes !== 1) {
+          return response({
+            success: false,
+            message: "Admin pertama sudah dibuat atau username tidak dapat digunakan."
+          }, 409);
+        }
+
+        return response({
+          success: true,
+          message: "Admin pertama berhasil dibuat. Silakan login."
+        }, 201);
+      }
+
+      // LOGIN ADMIN
+      if (path === "/api/admin/login" && method === "POST") {
+        const body = await request.json();
+        const username = String(body.username || "").trim();
+        const password = String(body.password || "");
+
+        if (!username || !password || password.length > 128) {
+          return response({
+            success: false,
+            message: "Username atau password salah."
+          }, 401);
+        }
+
+        const admin = await env.DB.prepare(`
+          SELECT id, username, password_hash
+          FROM admins
+          WHERE username = ?
+        `).bind(username).first();
+
+        if (
+          !admin ||
+          !(await verifyPassword(password, admin.password_hash))
+        ) {
+          return response({
+            success: false,
+            message: "Username atau password salah."
+          }, 401);
+        }
+
+        const token = randomBytesHex(32);
+        const tokenHash = await sha256(token);
+
+        await env.DB.prepare(`
+          DELETE FROM admin_sessions
+          WHERE expires_at <= CURRENT_TIMESTAMP
+        `).run();
+
+        await env.DB.prepare(`
+          INSERT INTO admin_sessions
+          (admin_id, token_hash, expires_at)
+          VALUES (?, ?, datetime('now', '+12 hours'))
+        `).bind(admin.id, tokenHash).run();
+
+        return response({
+          success: true,
+          message: "Login berhasil.",
+          token,
+          expires_in: SESSION_HOURS * 60 * 60,
+          admin: {
+            id: admin.id,
+            username: admin.username
+          }
+        });
+      }
+
+      // PERIKSA SESI ADMIN
+      if (path === "/api/admin/me" && method === "GET") {
+        const admin = await getAdmin(request, env);
+
+        if (!admin) {
+          return response({
+            success: false,
+            message: "Sesi tidak valid atau sudah berakhir."
+          }, 401);
+        }
+
+        return response({
+          success: true,
+          admin: {
+            id: admin.id,
+            username: admin.username
+          }
+        });
+      }
+
+      // LOGOUT ADMIN
+      if (path === "/api/admin/logout" && method === "POST") {
+        const authorization = request.headers.get("Authorization") || "";
+        const match = authorization.match(/^Bearer ([a-f0-9]{64})$/i);
+
+        if (match) {
+          const tokenHash = await sha256(match[1]);
+
+          await env.DB.prepare(`
+            DELETE FROM admin_sessions
+            WHERE token_hash = ?
+          `).bind(tokenHash).run();
+        }
+
+        return response({
+          success: true,
+          message: "Logout berhasil."
+        });
+      }
+
+      // KIRIM ASPIRASI
+      if (path === "/api/aspirations" && method === "POST") {
         const body = await request.json();
 
         const category = String(body.category || "").trim();
@@ -133,24 +390,13 @@ export default {
           success: true,
           message: "Aspirasi berhasil dikirim.",
           tracking_code: trackingCode,
-          pin: pin,
+          pin,
           note: "Simpan kode dan PIN ini dengan aman."
         }, 201);
-
-      } catch (error) {
-        return response({
-          success: false,
-          message: "Gagal menyimpan aspirasi."
-        }, 500);
       }
-    }
 
-    // PELACAKAN ASPIRASI
-    if (
-      url.pathname === "/api/track" &&
-      request.method === "POST"
-    ) {
-      try {
+      // PELACAKAN ASPIRASI
+      if (path === "/api/track" && method === "POST") {
         const body = await request.json();
 
         const trackingCode = String(
@@ -197,8 +443,8 @@ export default {
           SELECT sender_type, message, visibility, created_at
           FROM aspiration_messages
           WHERE aspiration_id = ?
-AND visibility = 'public'
-ORDER BY created_at ASC, id ASC
+            AND visibility = 'public'
+          ORDER BY created_at ASC, id ASC
         `).bind(aspiration.id).all();
 
         return response({
@@ -217,19 +463,19 @@ ORDER BY created_at ASC, id ASC
           },
           replies: messages.results || []
         });
-
-      } catch (error) {
-        return response({
-          success: false,
-          message: "Terjadi kesalahan saat melacak aspirasi."
-        }, 500);
       }
-    }
 
-    return response({
-      success: false,
-      message: "Endpoint tidak ditemukan."
-    }, 404);
+      return response({
+        success: false,
+        message: "Endpoint tidak ditemukan."
+      }, 404);
+
+    } catch (error) {
+      return response({
+        success: false,
+        message: "Terjadi kesalahan pada server."
+      }, 500);
+    }
   }
 };
-                          
+                        
