@@ -465,6 +465,118 @@ export default {
         });
       }
 
+// ==========================================
+// ADMIN: DAFTAR ASPIRASI
+// ==========================================
+if (
+  url.pathname === "/api/admin/aspirations" &&
+  request.method === "GET"
+) {
+  const admin = await getAdmin(request, env);
+
+  if (!admin) {
+    return response({
+      success: false,
+      message: "Sesi admin tidak valid atau sudah berakhir."
+    }, 401);
+  }
+
+  const allowedStatuses = [
+    "Menunggu",
+    "Dibaca",
+    "Diproses",
+    "Selesai"
+  ];
+
+  const status = url.searchParams.get("status");
+  const requestedPage = Number.parseInt(
+  url.searchParams.get("page") || "1",
+  10
+);
+
+const page = Math.min(
+  100000,
+  Math.max(1, Number.isSafeInteger(requestedPage) ? requestedPage : 1)
+);
+  );
+
+  const limit = Math.min(
+    50,
+    Math.max(
+      1,
+      Number.parseInt(url.searchParams.get("limit") || "20", 10) || 20
+    )
+  );
+
+  if (status && !allowedStatuses.includes(status)) {
+    return response({
+      success: false,
+      message: "Filter status tidak valid."
+    }, 400);
+  }
+
+  const offset = (page - 1) * limit;
+
+  let query = `
+    SELECT
+      id,
+      tracking_code,
+      category,
+      title,
+      sender_name,
+      is_anonymous,
+      status,
+      is_published,
+      created_at,
+      updated_at
+    FROM aspirations
+  `;
+
+  const values = [];
+
+  if (status) {
+    query += " WHERE status = ?";
+    values.push(status);
+  }
+
+  query += `
+    ORDER BY created_at DESC, id DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  values.push(limit, offset);
+
+  const result = await env.DB
+    .prepare(query)
+    .bind(...values)
+    .all();
+
+  let countQuery = "SELECT COUNT(*) AS total FROM aspirations";
+  const countValues = [];
+
+  if (status) {
+    countQuery += " WHERE status = ?";
+    countValues.push(status);
+  }
+
+  const countResult = await env.DB
+    .prepare(countQuery)
+    .bind(...countValues)
+    .first();
+
+  return response({
+    success: true,
+    message: "Daftar aspirasi berhasil ditemukan.",
+    pagination: {
+      page,
+      limit,
+      total: countResult.total,
+      total_pages: Math.ceil(countResult.total / limit)
+    },
+    aspirations: result.results
+  });
+}
+      
       return response({
         success: false,
         message: "Endpoint tidak ditemukan."
