@@ -1054,7 +1054,7 @@ async function loadDashboard() {
   const timeout = setTimeout(() => controller.abort(), 15000);
 
   try {
-    statusText.textContent = "Menghubungkan ke server...";
+    statusText.textContent = "Memuat Dashboard Diagnostik v2.2...";
 
     const response = await fetch(
       `${API_URL}/api/admin/aspirations?limit=50&page=1`,
