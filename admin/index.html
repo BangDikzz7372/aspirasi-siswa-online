@@ -4,11 +4,229 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Aspirasi | OSIS</title>
+  <meta name="theme-color" content="#0b1424">
+  <title>Login Admin — ASPIRASI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #0b1424;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 390px;
+      padding: 30px 24px;
+      background: #14243a;
+      border: 1px solid #263d5b;
+      border-radius: 18px;
+      box-shadow: 0 15px 45px #0005;
+    }
+
+    .logo {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 18px;
+      background: #1765c1;
+      border-radius: 16px;
+      font-size: 28px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 25px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      margin: 9px 0 28px;
+      color: #9db1ca;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #dce8f7;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 19px;
+      color: #fff;
+      background: #0d1a2b;
+      border: 1px solid #344b68;
+      border-radius: 10px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: #4295f5;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #176bd0;
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+    }
+
+    #message {
+      margin-top: 16px;
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .footer {
+      margin-top: 25px;
+      text-align: center;
+      color: #8197b2;
+      font-size: 11px;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Panel Admin Aspirasi</h1>
-  <p>OSIS SMA Negeri 1 Batang Hari Leko</p>
-  <p>Halaman khusus pengelola aspirasi siswa.</p>
+  <main class="login-card">
+    <div class="logo">📢</div>
+
+    <h1>ASPIRASI</h1>
+
+    <p class="subtitle">
+      ADMIN PANEL<br>
+      OSIS SMAN 1 BATANG HARI LEKO
+    </p>
+
+    <form id="loginForm">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        type="text"
+        placeholder="Masukkan username"
+        autocomplete="username"
+        required
+      >
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        placeholder="Masukkan password"
+        autocomplete="current-password"
+        required
+      >
+
+      <button id="loginButton" type="submit">
+        Masuk ke Dashboard
+      </button>
+    </form>
+
+    <p id="message" role="status"></p>
+
+    <div class="footer">
+      ASPIRASI — STUDENT VOICE<br>
+      © 2026 OSIS SMAN 1 BATANG HARI LEKO
+    </div>
+  </main>
+
+  <script>
+    const API_URL =
+      "https://aspirasi-siswa-api.dikaandiyansyah328.workers.dev";
+
+    const form = document.getElementById("loginForm");
+    const button = document.getElementById("loginButton");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const username =
+        document.getElementById("username").value.trim();
+
+      const password =
+        document.getElementById("password").value;
+
+      button.disabled = true;
+      button.textContent = "Memeriksa...";
+      message.textContent = "";
+
+      try {
+        const response = await fetch(
+          `${API_URL}/api/admin/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              username,
+              password
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(
+            data.message || "Login gagal."
+          );
+        }
+
+        if (
+          typeof data.token !== "string" ||
+          !/^[a-f0-9]{64}$/i.test(data.token)
+        ) {
+          throw new Error("Respons token tidak valid.");
+        }
+
+        sessionStorage.setItem(
+          "aspirasi_admin_token",
+          data.token
+        );
+
+        message.style.color = "#69e6a0";
+        message.textContent = "Login berhasil!";
+
+        window.location.href = "dashboard.html";
+
+      } catch (error) {
+        message.style.color = "#ff8585";
+        message.textContent = error.message;
+      } finally {
+        button.disabled = false;
+        button.textContent = "Masuk ke Dashboard";
+      }
+    });
+  </script>
 </body>
 </html>
