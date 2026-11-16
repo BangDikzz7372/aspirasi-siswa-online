@@ -828,6 +828,94 @@ if (replyMatch && request.method === "POST") {
     visibility: visibility
   });
 }
+    
+      // PUBLIKASI ASPIRASI ADMIN
+      const publishMatch = url.pathname.match(
+        /^\/api\/admin\/aspirations\/(\d+)\/publish$/
+      );
+
+      if (publishMatch && request.method === "POST") {
+        const admin = await getAdmin(request, env);
+
+        if (!admin) {
+          return response({
+            success: false,
+            message: "Sesi admin tidak valid atau sudah berakhir."
+          }, 401);
+        }
+
+        const aspirationId = Number(publishMatch[1]);
+
+        if (!Number.isSafeInteger(aspirationId) || aspirationId < 1) {
+          return response({
+            success: false,
+            message: "ID aspirasi tidak valid."
+          }, 400);
+        }
+
+        let body;
+
+        try {
+          body = await request.json();
+        } catch {
+          return response({
+            success: false,
+            message: "Format JSON tidak valid."
+          }, 400);
+        }
+
+        if (
+          !body ||
+          typeof body !== "object" ||
+          Array.isArray(body)
+        ) {
+          return response({
+            success: false,
+            message: "Format data tidak valid."
+          }, 400);
+        }
+
+        if (![0, 1].includes(body.is_published)) {
+          return response({
+            success: false,
+            message: "Nilai publikasi harus 0 atau 1."
+          }, 400);
+        }
+
+        const existing = await env.DB.prepare(`
+          SELECT id
+          FROM aspirations
+          WHERE id = ?
+        `).bind(aspirationId).first();
+
+        if (!existing) {
+          return response({
+            success: false,
+            message: "Aspirasi tidak ditemukan."
+          }, 404);
+        }
+
+        await env.DB.prepare(`
+          UPDATE aspirations
+          SET
+            is_published = ?,
+            updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).bind(
+          body.is_published,
+          aspirationId
+        ).run();
+
+        return response({
+          success: true,
+          message: body.is_published === 1
+            ? "Aspirasi berhasil dipublikasikan."
+            : "Publikasi aspirasi berhasil dinonaktifkan.",
+          aspiration_id: aspirationId,
+          is_published: body.is_published
+        });
+      }
+    
       
       
       
