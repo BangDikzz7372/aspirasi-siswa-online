@@ -578,6 +578,75 @@ const limit = Math.min(
   });
 }
       
+// DETAIL ASPIRASI ADMIN
+const detailMatch = url.pathname.match(
+  /^\/api\/admin\/aspirations\/(\d+)$/
+);
+
+if (detailMatch && request.method === "GET") {
+  const admin = await getAdmin(request, env);
+
+  if (!admin) {
+    return response({
+      success: false,
+      message: "Sesi admin tidak valid atau sudah berakhir."
+    }, 401);
+  }
+
+  const aspirationId = Number(detailMatch[1]);
+
+  if (!Number.isSafeInteger(aspirationId) || aspirationId < 1) {
+    return response({
+      success: false,
+      message: "ID aspirasi tidak valid."
+    }, 400);
+  }
+
+  const aspiration = await env.DB.prepare(`
+    SELECT
+      id,
+      tracking_code,
+      category,
+      title,
+      content,
+      sender_name,
+      is_anonymous,
+      status,
+      is_published,
+      created_at,
+      updated_at
+    FROM aspirations
+    WHERE id = ?
+  `).bind(aspirationId).first();
+
+  if (!aspiration) {
+    return response({
+      success: false,
+      message: "Aspirasi tidak ditemukan."
+    }, 404);
+  }
+
+  const messages = await env.DB.prepare(`
+    SELECT
+      id,
+      sender_type,
+      message,
+      visibility,
+      created_at
+    FROM aspiration_messages
+    WHERE aspiration_id = ?
+    ORDER BY created_at ASC, id ASC
+  `).bind(aspirationId).all();
+
+  return response({
+    success: true,
+    message: "Detail aspirasi berhasil ditemukan.",
+    aspiration,
+    replies: messages.results
+  });
+}
+      
+      
       return response({
         success: false,
         message: "Endpoint tidak ditemukan."
