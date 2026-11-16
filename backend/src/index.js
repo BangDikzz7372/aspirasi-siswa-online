@@ -915,6 +915,37 @@ if (replyMatch && request.method === "POST") {
           is_published: body.is_published
         });
       }
+      // DAFTAR PENGUMUMAN ADMIN
+if (
+  url.pathname === "/api/admin/announcements" &&
+  request.method === "GET"
+) {
+  const admin = await getAdmin(request, env);
+
+  if (!admin) {
+    return response({
+      success: false,
+      message: "Sesi admin tidak valid atau sudah berakhir."
+    }, 401);
+  }
+
+  const result = await env.DB.prepare(`
+    SELECT
+      id,
+      title,
+      content,
+      is_published,
+      created_at
+    FROM announcements
+    ORDER BY created_at DESC, id DESC
+  `).all();
+
+  return response({
+    success: true,
+    message: "Daftar pengumuman berhasil ditemukan.",
+    announcements: result.results
+  });
+}
     
       
       
