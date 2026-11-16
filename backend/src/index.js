@@ -946,6 +946,73 @@ if (
     announcements: result.results
   });
 }
+      // BUAT PENGUMUMAN ADMIN
+if (
+  url.pathname === "/api/admin/announcements" &&
+  request.method === "POST"
+) {
+  const admin = await getAdmin(request, env);
+
+  if (!admin) {
+    return response({
+      success: false,
+      message: "Sesi admin tidak valid atau sudah berakhir."
+    }, 401);
+  }
+
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return response({
+      success: false,
+      message: "Format JSON tidak valid."
+    }, 400);
+  }
+
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return response({
+      success: false,
+      message: "Data pengumuman tidak valid."
+    }, 400);
+  }
+
+  const title =
+    typeof body.title === "string" ? body.title.trim() : "";
+
+  const content =
+    typeof body.content === "string" ? body.content.trim() : "";
+
+  if (title.length < 3 || title.length > 120) {
+    return response({
+      success: false,
+      message: "Judul harus 3–120 karakter."
+    }, 400);
+  }
+
+  if (content.length < 10 || content.length > 3000) {
+    return response({
+      success: false,
+      message: "Isi harus 10–3000 karakter."
+    }, 400);
+  }
+
+  const result = await env.DB.prepare(`
+    INSERT INTO announcements (
+      title,
+      content,
+      is_published
+    ) VALUES (?, ?, 0)
+  `).bind(title, content).run();
+
+  return response({
+    success: true,
+    message: "Pengumuman berhasil dibuat.",
+    announcement_id: result.meta.last_row_id,
+    is_published: 0
+  });
+}
     
       
       
