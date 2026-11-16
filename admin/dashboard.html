@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -6,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b1424">
 <title>Dashboard Admin — ASPIRASI</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 
 <style>
 * {
@@ -16,23 +16,28 @@
 
 :root {
   --bg: #0b1424;
-  --panel: #14243a;
-  --card: #182740;
-  --border: #263955;
+  --panel: #111d33;
+  --card: #16213a;
+  --border: #24314d;
   --text: #f4f7ff;
-  --muted: #91a5c2;
-  --blue: #559cff;
-  --green: #5bd6b0;
-  --orange: #ffb65e;
-  --purple: #b58aff;
+  --muted: #8ea0c4;
+  --blue: #5b9bff;
+  --green: #4cc99a;
+  --orange: #f5a94a;
+  --purple: #a98bf0;
+  --space-1: 8px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 24px;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: Arial, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   min-height: 100vh;
-  padding-bottom: 95px;
+  padding-bottom: 76px;
+  line-height: 1.4;
 }
 
 button {
@@ -40,10 +45,15 @@ button {
   cursor: pointer;
 }
 
+button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
 header {
-  background: #111d33;
-  border: 1px solid var(--border);
-  padding: 18px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-2) var(--space-3);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,49 +65,57 @@ header {
 .brand {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 10px;
 }
 
 .brand-icon {
-  background: #286ce0;
-  width: 54px;
-  height: 54px;
-  border-radius: 15px;
+  background: #2f6fe4;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 25px;
+  font-size: 20px;
+  color: #fff;
 }
 
 .brand h2 {
-  font-size: 19px;
+  font-size: 16px;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .brand p {
   color: var(--muted);
-  font-size: 13px;
-  margin-top: 5px;
+  font-size: 12px;
+  margin-top: 2px;
 }
 
 .header-actions {
   display: flex;
-  gap: 10px;
+  gap: var(--space-1);
 }
 
 .icon-button {
   border: none;
-  background: #1a2943;
-  color: white;
-  width: 47px;
-  height: 47px;
+  background: #1a2540;
+  color: #c5d1ea;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  font-size: 20px;
+  font-size: 18px;
+  display: grid;
+  place-items: center;
+}
+
+.icon-button.danger {
+  color: #f08a8a;
 }
 
 main {
-  max-width: 1050px;
+  max-width: 900px;
   margin: auto;
-  padding: 25px 18px;
+  padding: var(--space-4) var(--space-3);
 }
 
 .view {
@@ -109,48 +127,51 @@ main {
 }
 
 .heading {
-  margin-bottom: 25px;
+  margin-bottom: var(--space-3);
 }
 
 .heading h1 {
-  font-size: 29px;
+  font-size: 22px;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .heading p {
   color: var(--muted);
-  margin-top: 8px;
+  font-size: 13px;
+  margin-top: 4px;
 }
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 13px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .stat-card {
   background: var(--card);
-  border: 1px solid #202f49;
-  padding: 21px;
-  border-radius: 23px;
-  min-height: 145px;
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 14px;
 }
 
 .stat-top {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .stat-icon {
-  font-size: 21px;
+  font-size: 18px;
 }
 
 .stat-card h2 {
-  font-size: 36px;
-  font-weight: 500;
-  margin-top: 18px;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  margin-top: 8px;
 }
 
 .blue { color: var(--blue); }
@@ -159,28 +180,30 @@ main {
 .green { color: var(--green); }
 
 .progress-card {
-  margin-top: 15px;
+  margin-top: 10px;
   background: var(--card);
-  border: 1px solid #202f49;
-  padding: 20px;
-  border-radius: 22px;
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 14px;
 }
 
 .progress-info {
   display: flex;
   justify-content: space-between;
   color: var(--muted);
-  margin-bottom: 15px;
+  font-size: 13px;
+  margin-bottom: 10px;
 }
 
 .progress-info strong {
-  color: white;
+  color: var(--text);
+  font-weight: 600;
 }
 
 .progress-track {
-  height: 10px;
-  background: #263752;
-  border-radius: 20px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 4px;
   overflow: hidden;
 }
 
@@ -188,43 +211,47 @@ main {
   height: 100%;
   width: 0%;
   background: var(--purple);
-  border-radius: 20px;
+  border-radius: 4px;
   transition: width .4s;
 }
 
 .section-title {
-  margin: 35px 0 18px;
-  font-size: 21px;
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .menu {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 13px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .menu button {
   background: var(--card);
-  border: 1px solid #263955;
-  color: white;
-  border-radius: 21px;
-  min-height: 90px;
-  padding: 15px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 14px;
+  min-height: 56px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 10px;
   text-align: left;
-  font-size: 15px;
-  transition: .2s;
+  font-size: 14px;
+  transition: background .2s;
+}
+
+.menu button:hover {
+  background: #1b2a47;
 }
 
 .menu button:active {
-  transform: scale(.97);
   background: #203653;
 }
 
 .menu-icon {
-  font-size: 26px;
+  font-size: 22px;
 }
 
 .list-header {
@@ -237,22 +264,22 @@ main {
   background: none;
   border: none;
   color: var(--blue);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .recent-box {
   background: var(--card);
-  border: 1px solid #263955;
-  border-radius: 22px;
-  padding: 5px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0 14px;
 }
 
 .aspiration-item {
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 17px 0;
-  border-bottom: 1px solid #263955;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
 }
 
 .aspiration-item:last-child {
@@ -260,15 +287,16 @@ main {
 }
 
 .avatar {
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
-  background: #253754;
+  background: var(--border);
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: #c4d4ed;
-  font-size: 14px;
+  color: #c5d1ea;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .aspiration-info {
@@ -277,68 +305,74 @@ main {
 }
 
 .aspiration-info h3 {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   overflow-wrap: anywhere;
 }
 
 .aspiration-info p {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
-  margin-top: 5px;
+  margin-top: 2px;
 }
 
 .status {
-  padding: 7px 10px;
-  border-radius: 20px;
-  font-size: 12px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  font-size: 11px;
   white-space: nowrap;
   background: #263752;
 }
 
 .status.menunggu {
-  color: var(--orange);
-  background: #45351f;
+  color: #f8c98a;
+  background: #3d2f17;
 }
 
 .status.diproses {
-  color: var(--purple);
-  background: #342747;
+  color: #c9b6ff;
+  background: #2d2750;
 }
 
 .status.selesai {
-  color: var(--green);
-  background: #1c4039;
+  color: #8fe3c4;
+  background: #16372f;
 }
 
 .status.dibaca {
-  color: var(--blue);
-  background: #203956;
+  color: #9cc4ff;
+  background: #1b3354;
 }
 
 .empty {
   color: var(--muted);
   text-align: center;
-  padding: 30px 10px;
-  font-size: 14px;
+  padding: 24px 10px;
+  font-size: 13px;
 }
 
 .content-card {
   background: var(--card);
   border: 1px solid var(--border);
-  padding: 20px;
-  border-radius: 20px;
-  margin-bottom: 13px;
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 10px;
 }
 
 .content-card h3 {
-  margin-bottom: 9px;
+  font-size: 15px;
+  margin-bottom: 6px;
 }
 
 .content-card p {
   color: var(--muted);
   line-height: 1.6;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+.content-card .status {
+  display: inline-block;
+  margin-top: 12px;
 }
 
 .bottom-nav {
@@ -347,26 +381,26 @@ main {
   left: 0;
   right: 0;
   z-index: 20;
-  background: #111d33;
+  background: var(--panel);
   border-top: 1px solid var(--border);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  padding: 10px 5px calc(10px + env(safe-area-inset-bottom));
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
 }
 
 .nav-button {
   border: none;
   background: none;
-  color: #8498b7;
-  padding: 7px 2px;
+  color: var(--muted);
+  padding: 4px 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  font-size: 12px;
+  gap: 2px;
+  font-size: 11px;
 }
 
-.nav-button span {
+.nav-button i {
   font-size: 22px;
 }
 
@@ -376,17 +410,14 @@ main {
 
 #status {
   color: var(--muted);
-  font-size: 13px;
-  margin-top: 18px;
+  font-size: 12px;
+  margin-top: var(--space-3);
 }
 
 @media (min-width: 700px) {
-  .stats {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
+  .stats,
   .menu {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .menu button {
@@ -400,7 +431,7 @@ main {
 
 <header>
   <div class="brand">
-    <div class="brand-icon">▤</div>
+    <div class="brand-icon"><i class="ti ti-message-2" aria-hidden="true"></i></div>
     <div>
       <h2>Aspirasi admin</h2>
       <p>OSIS SMAN 1 Batang Hari Leko</p>
@@ -408,8 +439,12 @@ main {
   </div>
 
   <div class="header-actions">
-    <button class="icon-button" onclick="showNotifications()">♧</button>
-    <button class="icon-button" onclick="logout()">⇥</button>
+    <button class="icon-button" onclick="showNotifications()" aria-label="Notifikasi">
+      <i class="ti ti-bell" aria-hidden="true"></i>
+    </button>
+    <button class="icon-button danger" onclick="logout()" aria-label="Keluar">
+      <i class="ti ti-logout" aria-hidden="true"></i>
+    </button>
   </div>
 </header>
 
@@ -428,7 +463,7 @@ main {
       <div class="stat-card">
         <div class="stat-top">
           Total
-          <span class="stat-icon blue">▣</span>
+          <i class="ti ti-inbox stat-icon blue" aria-hidden="true"></i>
         </div>
         <h2 id="total">-</h2>
       </div>
@@ -436,7 +471,7 @@ main {
       <div class="stat-card">
         <div class="stat-top">
           Menunggu
-          <span class="stat-icon orange">◷</span>
+          <i class="ti ti-clock stat-icon orange" aria-hidden="true"></i>
         </div>
         <h2 id="waiting">-</h2>
       </div>
@@ -444,7 +479,7 @@ main {
       <div class="stat-card">
         <div class="stat-top">
           Diproses
-          <span class="stat-icon purple">◌</span>
+          <i class="ti ti-loader-2 stat-icon purple" aria-hidden="true"></i>
         </div>
         <h2 id="processed">-</h2>
       </div>
@@ -452,7 +487,7 @@ main {
       <div class="stat-card">
         <div class="stat-top">
           Selesai
-          <span class="stat-icon green">✓</span>
+          <i class="ti ti-circle-check stat-icon green" aria-hidden="true"></i>
         </div>
         <h2 id="completed">-</h2>
       </div>
@@ -473,22 +508,22 @@ main {
 
     <div class="menu">
       <button onclick="navigate('aspirations')">
-        <span class="menu-icon blue">▣</span>
+        <i class="ti ti-inbox menu-icon blue" aria-hidden="true"></i>
         Data aspirasi
       </button>
 
       <button onclick="navigate('aspirations')">
-        <span class="menu-icon green">▤</span>
+        <i class="ti ti-messages menu-icon green" aria-hidden="true"></i>
         Balasan
       </button>
 
       <button onclick="navigate('info')">
-        <span class="menu-icon orange">⚑</span>
+        <i class="ti ti-speakerphone menu-icon orange" aria-hidden="true"></i>
         Pengumuman
       </button>
 
       <button onclick="navigate('settings')">
-        <span class="menu-icon purple">⚙</span>
+        <i class="ti ti-settings menu-icon purple" aria-hidden="true"></i>
         Pengaturan
       </button>
     </div>
@@ -511,7 +546,7 @@ main {
   <!-- ASPIRASI -->
   <section class="view" id="aspirationsView">
     <div class="heading">
-      <h1>Data Aspirasi</h1>
+      <h1>Data aspirasi</h1>
       <p>Daftar aspirasi yang masuk</p>
     </div>
 
@@ -540,12 +575,12 @@ main {
     </div>
 
     <div class="content-card">
-      <h3>Akun Administrator</h3>
+      <h3>Akun administrator</h3>
       <p>Panel pengelolaan ASPIRASI OSIS.</p>
     </div>
 
     <div class="content-card">
-      <h3>Sesi Admin</h3>
+      <h3>Sesi admin</h3>
       <p>Sesi login berlaku sesuai pengaturan keamanan server.</p>
       <br>
       <button class="link-button" onclick="logout()">Keluar dari akun</button>
@@ -556,22 +591,22 @@ main {
 
 <nav class="bottom-nav">
   <button class="nav-button active" data-view="home" onclick="navigate('home')">
-    <span>▦</span>
+    <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
     Beranda
   </button>
 
   <button class="nav-button" data-view="aspirations" onclick="navigate('aspirations')">
-    <span>▣</span>
+    <i class="ti ti-inbox" aria-hidden="true"></i>
     Aspirasi
   </button>
 
   <button class="nav-button" data-view="info" onclick="navigate('info')">
-    <span>⚑</span>
+    <i class="ti ti-speakerphone" aria-hidden="true"></i>
     Info
   </button>
 
   <button class="nav-button" data-view="settings" onclick="navigate('settings')">
-    <span>⚙</span>
+    <i class="ti ti-settings" aria-hidden="true"></i>
     Atur
   </button>
 </nav>
@@ -731,7 +766,6 @@ async function loadAnnouncements() {
           <div class="content-card">
             <h3>${escapeHTML(item.title)}</h3>
             <p>${escapeHTML(item.content)}</p>
-            <br>
             <span class="status ${Number(item.is_published) === 1 ? "selesai" : "menunggu"}">
               ${Number(item.is_published) === 1 ? "Dipublikasikan" : "Draft"}
             </span>
