@@ -724,6 +724,112 @@ if (statusMatch && request.method === "POST") {
   });
 }
       
+// BALAS ASPIRASI ADMIN
+const replyMatch = url.pathname.match(
+  /^\/api\/admin\/aspirations\/(\d+)\/reply$/
+);
+
+if (replyMatch && request.method === "POST") {
+  const admin = await getAdmin(request, env);
+
+  if (!admin) {
+    return response({
+      success: false,
+      message: "Sesi admin tidak valid atau sudah berakhir."
+    }, 401);
+  }
+
+  const aspirationId = Number(replyMatch[1]);
+
+  if (!Number.isSafeInteger(aspirationId) || aspirationId < 1) {
+    return response({
+      success: false,
+      message: "ID aspirasi tidak valid."
+    }, 400);
+  }
+
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return response({
+      success: false,
+      message: "Format JSON tidak valid."
+    }, 400);
+  }
+
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return response({
+      success: false,
+      message: "Format data tidak valid."
+    }, 400);
+  }
+
+  const message =
+    typeof body.message === "string"
+      ? body.message.trim()
+      : "";
+
+  const visibility = body.visibility;
+
+  if (message.length < 1 || message.length > 3000) {
+    return response({
+      success: false,
+      message: "Balasan harus berisi 1 sampai 3000 karakter."
+    }, 400);
+  }
+
+  if (!["public", "private"].includes(visibility)) {
+    return response({
+      success: false,
+      message: "Jenis visibilitas tidak valid."
+    }, 400);
+  }
+
+  const existing = await env.DB.prepare(`
+    SELECT id
+    FROM aspirations
+    WHERE id = ?
+  `).bind(aspirationId).first();
+
+  if (!existing) {
+    return response({
+      success: false,
+      message: "Aspirasi tidak ditemukan."
+    }, 404);
+  }
+
+  const result = await env.DB.prepare(`
+    INSERT INTO aspiration_messages (
+      aspiration_id,
+      sender_type,
+      message,
+      visibility
+    )
+    VALUES (?, 'admin', ?, ?)
+  `).bind(
+    aspirationId,
+    message,
+    visibility
+  ).run();
+
+  await env.DB.prepare(`
+    UPDATE aspirations
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).bind(aspirationId).run();
+
+  return response({
+    success: true,
+    message: "Balasan aspirasi berhasil dikirim.",
+    reply_id: result.meta.last_row_id,
+    aspiration_id: aspirationId,
+    visibility: visibility
+  });
+}
+      
+      
       
       
       return response({
