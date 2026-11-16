@@ -646,6 +646,85 @@ if (detailMatch && request.method === "GET") {
   });
 }
       
+// UPDATE STATUS ASPIRASI ADMIN
+const statusMatch = url.pathname.match(
+  /^\/api\/admin\/aspirations\/(\d+)\/status$/
+);
+
+if (statusMatch && request.method === "POST") {
+  const admin = await getAdmin(request, env);
+
+  if (!admin) {
+    return response({
+      success: false,
+      message: "Sesi admin tidak valid atau sudah berakhir."
+    }, 401);
+  }
+
+  const aspirationId = Number(statusMatch[1]);
+
+  if (!Number.isSafeInteger(aspirationId) || aspirationId < 1) {
+    return response({
+      success: false,
+      message: "ID aspirasi tidak valid."
+    }, 400);
+  }
+
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return response({
+      success: false,
+      message: "Format JSON tidak valid."
+    }, 400);
+  }
+
+  const allowedStatuses = [
+    "Menunggu",
+    "Dibaca",
+    "Diproses",
+    "Selesai"
+  ];
+
+  if (!allowedStatuses.includes(body.status)) {
+    return response({
+      success: false,
+      message: "Status aspirasi tidak valid."
+    }, 400);
+  }
+
+  const existing = await env.DB.prepare(`
+    SELECT id
+    FROM aspirations
+    WHERE id = ?
+  `).bind(aspirationId).first();
+
+  if (!existing) {
+    return response({
+      success: false,
+      message: "Aspirasi tidak ditemukan."
+    }, 404);
+  }
+
+  await env.DB.prepare(`
+    UPDATE aspirations
+    SET
+      status = ?,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).bind(body.status, aspirationId).run();
+
+  return response({
+    success: true,
+    message: "Status aspirasi berhasil diperbarui.",
+    aspiration_id: aspirationId,
+    status: body.status
+  });
+}
+      
+      
       
       return response({
         success: false,
