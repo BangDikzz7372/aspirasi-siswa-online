@@ -1013,6 +1013,84 @@ if (
     is_published: 0
   });
 }
+      // PUBLIKASI PENGUMUMAN ADMIN
+const announcementPublishMatch = url.pathname.match(
+  /^\/api\/admin\/announcements\/(\d+)\/publish$/
+);
+
+if (
+  announcementPublishMatch &&
+  request.method === "POST"
+) {
+  const admin = await getAdmin(request, env);
+
+  if (!admin) {
+    return response({
+      success: false,
+      message: "Sesi admin tidak valid atau sudah berakhir."
+    }, 401);
+  }
+
+  const announcementId = Number(announcementPublishMatch[1]);
+
+  if (!Number.isSafeInteger(announcementId) || announcementId < 1) {
+    return response({
+      success: false,
+      message: "ID pengumuman tidak valid."
+    }, 400);
+  }
+
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return response({
+      success: false,
+      message: "Format JSON tidak valid."
+    }, 400);
+  }
+
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return response({
+      success: false,
+      message: "Data publikasi tidak valid."
+    }, 400);
+  }
+
+  if (![0, 1].includes(body.is_published)) {
+    return response({
+      success: false,
+      message: "Status publikasi harus 0 atau 1."
+    }, 400);
+  }
+
+  const existing = await env.DB.prepare(`
+    SELECT id FROM announcements WHERE id = ?
+  `).bind(announcementId).first();
+
+  if (!existing) {
+    return response({
+      success: false,
+      message: "Pengumuman tidak ditemukan."
+    }, 404);
+  }
+
+  await env.DB.prepare(`
+    UPDATE announcements
+    SET is_published = ?
+    WHERE id = ?
+  `).bind(body.is_published, announcementId).run();
+
+  return response({
+    success: true,
+    message: body.is_published === 1
+      ? "Pengumuman berhasil dipublikasikan."
+      : "Publikasi pengumuman berhasil dinonaktifkan.",
+    announcement_id: announcementId,
+    is_published: body.is_published
+  });
+}
     
       
       
