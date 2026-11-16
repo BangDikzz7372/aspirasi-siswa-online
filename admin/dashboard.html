@@ -1040,33 +1040,47 @@ function renderRecent(items) {
   });
 }
 
+
 async function loadDashboard() {
+  statusText.textContent = "Memeriksa sesi admin...";
+
   if (!token) {
+    statusText.textContent = "Token tidak ditemukan. Silakan login ulang.";
     window.location.replace("index.html");
     return;
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+
   try {
+    statusText.textContent = "Menghubungkan ke server...";
+
     const response = await fetch(
       `${API_URL}/api/admin/aspirations?limit=50&page=1`,
       {
+        method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`
-        }
+        },
+        signal: controller.signal
       }
     );
+
+    statusText.textContent = "Menerima respons server...";
 
     const data = await response.json();
 
     if (!response.ok || !data.success) {
       if (response.status === 401) {
         sessionStorage.removeItem("aspirasi_admin_token");
+        statusText.textContent = "Sesi berakhir. Silakan login ulang.";
         window.location.replace("index.html");
         return;
       }
 
       throw new Error(
-        data.message || "Gagal mengambil data."
+        `HTTP ${response.status}: ${data.message || "Permintaan gagal."}`
       );
     }
 
@@ -1111,15 +1125,21 @@ async function loadDashboard() {
     renderRecent(aspirations);
 
     statusText.textContent =
-      "Data dashboard berhasil dimuat.";
+      `Berhasil! ${total} aspirasi ditemukan.`;
 
   } catch (error) {
-    statusText.textContent = error.message;
+    if (error.name === "AbortError") {
+      statusText.textContent =
+        "TIMEOUT: Server tidak merespons dalam 15 detik.";
+    } else {
+      statusText.textContent =
+        "ERROR: " + error.message;
+    }
+
+    console.error("Dashboard error:", error);
+
+  } finally {
+    clearTimeout(timeout);
   }
 }
-
-loadDashboard();
-</script>
-
-</body>
-</html>
+  
