@@ -1,427 +1,666 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b1424">
-<title>Dashboard Admin — ASPIRASI</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<meta name="theme-color" content="#0b1220">
+<title>ASPIRASI Admin — Dashboard</title>
 
 <style>
+:root {
+  --bg: #0b1220;
+  --panel: #111d30;
+  --panel2: #17263c;
+  --border: #263a55;
+  --text: #f1f5fb;
+  --muted: #91a3bb;
+  --blue: #4599ff;
+  --green: #39d99a;
+  --orange: #ffb65e;
+  --purple: #b895ff;
+  --red: #f16f7e;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-:root {
-  --bg: #0b1424;
-  --panel: #111d33;
-  --card: #16213a;
-  --border: #24314d;
-  --text: #f4f7ff;
-  --muted: #8ea0c4;
-  --blue: #5b9bff;
-  --green: #4cc99a;
-  --orange: #f5a94a;
-  --purple: #a98bf0;
-  --space-1: 8px;
-  --space-2: 12px;
-  --space-3: 16px;
-  --space-4: 24px;
-}
-
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
   min-height: 100vh;
-  padding-bottom: 76px;
-  line-height: 1.4;
 }
 
 button {
   font: inherit;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 250px;
+  background: #101b2d;
+  border-right: 1px solid var(--border);
+  padding: 25px 17px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform .25s ease;
+}
+
+.logo {
+  padding: 5px 12px 35px;
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: .5px;
+}
+
+.logo span {
+  color: var(--blue);
+}
+
+.menu-label {
+  color: #687d99;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  padding: 0 12px;
+  margin: 12px 0;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.nav button {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: #9cafc7;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 650;
   cursor: pointer;
+  transition: .2s;
 }
 
-button:focus-visible {
-  outline: 2px solid var(--blue);
-  outline-offset: 2px;
+.nav button:hover,
+.nav button.active {
+  color: white;
+  background: #1b3554;
+  border-color: #294d74;
 }
 
-header {
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
-  padding: var(--space-2) var(--space-3);
+.nav button.active {
+  box-shadow: inset 3px 0 var(--blue);
+}
+
+.nav-icon {
+  font-size: 17px;
+  width: 23px;
+  text-align: center;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 25px;
+}
+
+.sidebar-info {
+  background: #17283f;
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.sidebar-info strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.sidebar-info p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* MAIN */
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar {
+  height: 76px;
+  padding: 0 35px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  border-bottom: 1px solid var(--border);
+  background: #101b2d;
 }
 
-.brand {
+.top-left,
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.page-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.page-name span {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.admin-profile {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.brand-icon {
-  background: #2f6fe4;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  color: #fff;
-}
-
-.brand h2 {
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.brand p {
-  color: var(--muted);
   font-size: 12px;
-  margin-top: 2px;
+  color: var(--muted);
 }
 
-.header-actions {
-  display: flex;
-  gap: var(--space-1);
-}
-
-.icon-button {
-  border: none;
-  background: #1a2540;
-  color: #c5d1ea;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  font-size: 18px;
+.avatar {
+  width: 37px;
+  height: 37px;
   display: grid;
   place-items: center;
+  border-radius: 12px;
+  background: #214b78;
+  color: white;
+  font-weight: 800;
 }
 
-.icon-button.danger {
-  color: #f08a8a;
+.logout {
+  background: #482633;
+  border: 1px solid #713746;
+  color: #ff9eaa;
+  padding: 10px 14px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
 }
 
-main {
-  max-width: 900px;
-  margin: auto;
-  padding: var(--space-4) var(--space-3);
+.logout:hover {
+  background: #623040;
 }
 
-.view {
+.mobile-menu {
   display: none;
+  background: transparent;
+  color: white;
+  border: 0;
+  font-size: 23px;
+  cursor: pointer;
 }
 
-.view.active {
-  display: block;
+/* CONTENT */
+
+.content {
+  max-width: 1450px;
+  margin: auto;
+  padding: 34px;
 }
 
-.heading {
-  margin-bottom: var(--space-3);
+.welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 28px;
 }
 
-.heading h1 {
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.2;
+.welcome h1 {
+  font-size: 27px;
+  letter-spacing: -.7px;
+  margin-bottom: 8px;
 }
 
-.heading p {
+.welcome p {
   color: var(--muted);
   font-size: 13px;
-  margin-top: 4px;
 }
+
+.live-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #78dcb0;
+  background: #142c2b;
+  border: 1px solid #28534a;
+  border-radius: 30px;
+  padding: 8px 13px;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--green);
+}
+
+/* STATISTICS */
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 17px;
 }
 
 .stat-card {
-  background: var(--card);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, #172840, #111e31);
   border: 1px solid var(--border);
-  padding: 14px;
-  border-radius: 14px;
+  border-radius: 15px;
+  padding: 21px;
+  min-height: 145px;
+  transition: transform .2s, border-color .2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: #496b92;
 }
 
 .stat-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: var(--muted);
-  font-size: 13px;
+}
+
+.stat-title {
+  color: #a7b8ce;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .stat-icon {
-  font-size: 18px;
-}
-
-.stat-card h2 {
-  font-size: 28px;
-  font-weight: 600;
-  line-height: 1.1;
-  margin-top: 8px;
-}
-
-.blue { color: var(--blue); }
-.orange { color: var(--orange); }
-.purple { color: var(--purple); }
-.green { color: var(--green); }
-
-.progress-card {
-  margin-top: 10px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 14px;
-  border-radius: 14px;
-}
-
-.progress-info {
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: 13px;
-  margin-bottom: 10px;
-}
-
-.progress-info strong {
-  color: var(--text);
-  font-weight: 600;
-}
-
-.progress-track {
-  height: 6px;
-  background: var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  width: 0%;
-  background: var(--purple);
-  border-radius: 4px;
-  transition: width .4s;
-}
-
-.section-title {
-  margin: var(--space-4) 0 var(--space-2);
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.menu {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.menu button {
-  background: var(--card);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 14px;
-  min-height: 56px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-align: left;
-  font-size: 14px;
-  transition: background .2s;
-}
-
-.menu button:hover {
-  background: #1b2a47;
-}
-
-.menu button:active {
-  background: #203653;
-}
-
-.menu-icon {
-  font-size: 22px;
-}
-
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.link-button {
-  background: none;
-  border: none;
-  color: var(--blue);
-  font-size: 13px;
-}
-
-.recent-box {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 0 14px;
-}
-
-.aspiration-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.aspiration-item:last-child {
-  border-bottom: none;
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  background: var(--border);
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
-  color: #c5d1ea;
-  font-size: 12px;
-  font-weight: 600;
+  border-radius: 10px;
+  font-size: 16px;
 }
 
-.aspiration-info {
-  flex: 1;
+.stat-number {
+  font-size: 34px;
+  font-weight: 850;
+  margin-top: 17px;
+  letter-spacing: -1px;
+}
+
+.stat-card.blue .stat-number { color: var(--blue); }
+.stat-card.orange .stat-number { color: var(--orange); }
+.stat-card.purple .stat-number { color: var(--purple); }
+.stat-card.green .stat-number { color: var(--green); }
+
+.stat-card.blue .stat-icon { background: #203c5c; }
+.stat-card.orange .stat-icon { background: #493824; }
+.stat-card.purple .stat-icon { background: #382c55; }
+.stat-card.green .stat-icon { background: #1e443c; }
+
+/* PANELS */
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 22px;
   min-width: 0;
 }
 
-.aspiration-info h3 {
-  font-size: 14px;
-  font-weight: 500;
-  overflow-wrap: anywhere;
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
 }
 
-.aspiration-info p {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 2px;
+.panel-heading h2 {
+  font-size: 15px;
 }
 
-.status {
-  padding: 4px 9px;
-  border-radius: 8px;
+.panel-heading span {
   font-size: 11px;
+  color: var(--muted);
+}
+
+/* CHART */
+
+.chart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 35px;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.chart-label {
+  color: #a9b9ce;
+}
+
+.chart-track {
+  height: 9px;
+  background: #25344a;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.chart-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 20px;
+  transition: width .6s ease;
+}
+
+.chart-value {
+  text-align: right;
+  color: #d9e5f3;
+  font-weight: 750;
+}
+
+/* RECENT */
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 11px;
+  background: var(--panel2);
+  border: 1px solid #243851;
+}
+
+.recent-icon {
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #233d5d;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.recent-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.recent-info strong {
+  display: block;
+  font-size: 12px;
+  overflow: hidden;
   white-space: nowrap;
-  background: #263752;
+  text-overflow: ellipsis;
 }
 
-.status.menunggu {
-  color: #f8c98a;
-  background: #3d2f17;
+.recent-info small {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
 }
 
-.status.diproses {
-  color: #c9b6ff;
-  background: #2d2750;
+.status-badge {
+  font-size: 10px;
+  font-weight: 750;
+  padding: 6px 8px;
+  border-radius: 7px;
+  white-space: nowrap;
 }
 
-.status.selesai {
-  color: #8fe3c4;
-  background: #16372f;
+.status-Menunggu {
+  background: #483824;
+  color: #ffc078;
 }
 
-.status.dibaca {
-  color: #9cc4ff;
-  background: #1b3354;
+.status-Dibaca {
+  background: #233d5c;
+  color: #80baff;
+}
+
+.status-Diproses {
+  background: #392d53;
+  color: #c5a5ff;
+}
+
+.status-Selesai {
+  background: #1c4438;
+  color: #77e0af;
 }
 
 .empty {
   color: var(--muted);
+  font-size: 12px;
   text-align: center;
-  padding: 24px 10px;
-  font-size: 13px;
+  padding: 30px 10px;
 }
 
-.content-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 16px;
-  border-radius: 14px;
-  margin-bottom: 10px;
+/* QUICK MENU */
+
+.quick-menu {
+  margin-top: 22px;
 }
 
-.content-card h3 {
-  font-size: 15px;
-  margin-bottom: 6px;
-}
-
-.content-card p {
-  color: var(--muted);
-  line-height: 1.6;
-  font-size: 13px;
-}
-
-.content-card .status {
-  display: inline-block;
-  margin-top: 12px;
-}
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  background: var(--panel);
-  border-top: 1px solid var(--border);
+.quick-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  gap: 12px;
 }
 
-.nav-button {
-  border: none;
-  background: none;
-  color: var(--muted);
-  padding: 4px 2px;
+.quick-button {
+  background: #172a42;
+  border: 1px solid #2b4563;
+  color: white;
+  border-radius: 12px;
+  padding: 17px 12px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  font-size: 11px;
+  gap: 11px;
+  text-align: left;
+  cursor: pointer;
+  transition: .2s;
 }
 
-.nav-button i {
-  font-size: 22px;
+.quick-button:hover {
+  background: #203b5c;
+  transform: translateY(-2px);
 }
 
-.nav-button.active {
-  color: var(--blue);
+.quick-icon {
+  font-size: 20px;
+}
+
+.quick-button strong {
+  display: block;
+  font-size: 12px;
+}
+
+.quick-button small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
 }
 
 #status {
   color: var(--muted);
-  font-size: 12px;
-  margin-top: var(--space-3);
+  font-size: 11px;
+  margin-top: 18px;
 }
 
-@media (min-width: 700px) {
-  .stats,
-  .menu {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+footer {
+  text-align: center;
+  padding: 30px 15px;
+  color: #687d99;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+/* MOBILE */
+
+.overlay {
+  display: none;
+}
+
+@media(max-width: 1050px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .menu button {
-    justify-content: center;
+  .quick-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .panel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media(max-width: 650px) {
+  .sidebar {
+    position: fixed;
+    z-index: 20;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    width: 270px;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .overlay.show {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    z-index: 19;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+
+  .topbar {
+    height: 65px;
+    padding: 0 17px;
+  }
+
+  .page-name {
+    font-size: 12px;
+  }
+
+  .admin-profile span {
+    display: none;
+  }
+
+  .content {
+    padding: 24px 16px;
+  }
+
+  .welcome {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .welcome h1 {
+    font-size: 24px;
+  }
+
+  .stats {
+    gap: 11px;
+  }
+
+  .stat-card {
+    min-height: 125px;
+    padding: 15px;
+  }
+
+  .stat-number {
+    font-size: 29px;
+  }
+
+  .stat-title {
+    font-size: 11px;
+  }
+
+  .panel {
+    padding: 17px;
+  }
+
+  .quick-grid {
+    gap: 9px;
+  }
+
+  .quick-button {
+    padding: 14px 10px;
+    gap: 8px;
+  }
+
+  .quick-button strong {
+    font-size: 11px;
+  }
+
+  .chart-row {
+    grid-template-columns: 76px 1fr 25px;
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .status-badge {
+    font-size: 9px;
   }
 }
 </style>
@@ -429,187 +668,252 @@ main {
 
 <body>
 
-<header>
-  <div class="brand">
-    <div class="brand-icon"><i class="ti ti-message-2" aria-hidden="true"></i></div>
-    <div>
-      <h2>Aspirasi admin</h2>
-      <p>OSIS SMAN 1 Batang Hari Leko</p>
+<div class="overlay" id="overlay"></div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+  <div class="logo">ASPIRASI <span>ADMIN</span></div>
+
+  <div class="menu-label">MENU UTAMA</div>
+
+  <nav class="nav">
+    <button class="active" onclick="selectMenu(this, 'Dashboard')">
+      <span class="nav-icon">▦</span> Dashboard
+    </button>
+
+    <button onclick="comingSoon('Data Aspirasi')">
+      <span class="nav-icon">✉</span> Data Aspirasi
+    </button>
+
+    <button onclick="comingSoon('Balasan Aspirasi')">
+      <span class="nav-icon">☏</span> Balasan Aspirasi
+    </button>
+
+    <button onclick="comingSoon('Pengumuman')">
+      <span class="nav-icon">⚑</span> Pengumuman
+    </button>
+  </nav>
+
+  <div class="menu-label">LAINNYA</div>
+
+  <nav class="nav">
+    <button onclick="comingSoon('Pengaturan')">
+      <span class="nav-icon">⚙</span> Pengaturan
+    </button>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-info">
+      <strong>ASPIRASI — STUDENT VOICE</strong>
+      <p>Platform aspirasi siswa OSIS SMAN 1 Batang Hari Leko.</p>
     </div>
   </div>
 
-  <div class="header-actions">
-    <button class="icon-button" onclick="showNotifications()" aria-label="Notifikasi">
-      <i class="ti ti-bell" aria-hidden="true"></i>
-    </button>
-    <button class="icon-button danger" onclick="logout()" aria-label="Keluar">
-      <i class="ti ti-logout" aria-hidden="true"></i>
-    </button>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+<header class="topbar">
+
+  <div class="top-left">
+    <button class="mobile-menu" id="menuButton">☰</button>
+    <div class="page-name">
+      Admin Panel <span>/ Dashboard</span>
+    </div>
   </div>
+
+  <div class="top-right">
+
+    <div class="admin-profile">
+      <div class="avatar">A</div>
+      <span>Administrator OSIS</span>
+    </div>
+
+    <button class="logout" id="logoutButton">Logout ↗</button>
+
+  </div>
+
 </header>
 
-<main>
+<main class="content">
 
-  <!-- BERANDA -->
-  <section class="view active" id="homeView">
-
-    <div class="heading">
-      <h1>Dashboard</h1>
-      <p>Ringkasan aspirasi hari ini</p>
+  <section class="welcome">
+    <div>
+      <h1>Dashboard Overview</h1>
+      <p>Selamat datang di pusat pengelolaan aspirasi siswa.</p>
     </div>
 
-    <div class="stats">
-
-      <div class="stat-card">
-        <div class="stat-top">
-          Total
-          <i class="ti ti-inbox stat-icon blue" aria-hidden="true"></i>
-        </div>
-        <h2 id="total">-</h2>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-top">
-          Menunggu
-          <i class="ti ti-clock stat-icon orange" aria-hidden="true"></i>
-        </div>
-        <h2 id="waiting">-</h2>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-top">
-          Diproses
-          <i class="ti ti-loader-2 stat-icon purple" aria-hidden="true"></i>
-        </div>
-        <h2 id="processed">-</h2>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-top">
-          Selesai
-          <i class="ti ti-circle-check stat-icon green" aria-hidden="true"></i>
-        </div>
-        <h2 id="completed">-</h2>
-      </div>
-
-    </div>
-
-    <div class="progress-card">
-      <div class="progress-info">
-        <span>Progres penyelesaian</span>
-        <strong id="progressText">0%</strong>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-    </div>
-
-    <h2 class="section-title">Menu pengelolaan</h2>
-
-    <div class="menu">
-      <button onclick="navigate('aspirations')">
-        <i class="ti ti-inbox menu-icon blue" aria-hidden="true"></i>
-        Data aspirasi
-      </button>
-
-      <button onclick="navigate('aspirations')">
-        <i class="ti ti-messages menu-icon green" aria-hidden="true"></i>
-        Balasan
-      </button>
-
-      <button onclick="navigate('info')">
-        <i class="ti ti-speakerphone menu-icon orange" aria-hidden="true"></i>
-        Pengumuman
-      </button>
-
-      <button onclick="navigate('settings')">
-        <i class="ti ti-settings menu-icon purple" aria-hidden="true"></i>
-        Pengaturan
-      </button>
-    </div>
-
-    <div class="list-header">
-      <h2 class="section-title">Aspirasi terbaru</h2>
-      <button class="link-button" onclick="navigate('aspirations')">
-        Lihat semua
-      </button>
-    </div>
-
-    <div class="recent-box" id="recentList">
-      <p class="empty">Memuat aspirasi...</p>
-    </div>
-
-    <p id="status">Memuat data dashboard...</p>
-
-  </section>
-
-  <!-- ASPIRASI -->
-  <section class="view" id="aspirationsView">
-    <div class="heading">
-      <h1>Data aspirasi</h1>
-      <p>Daftar aspirasi yang masuk</p>
-    </div>
-
-    <div class="recent-box" id="allAspirations">
-      <p class="empty">Memuat data...</p>
+    <div class="live-status">
+      <span class="dot"></span>
+      BACKEND TERHUBUNG
     </div>
   </section>
 
-  <!-- INFO -->
-  <section class="view" id="infoView">
-    <div class="heading">
-      <h1>Informasi</h1>
-      <p>Pengumuman dari OSIS</p>
+  <!-- STATISTICS -->
+  <section class="stats">
+
+    <div class="stat-card blue">
+      <div class="stat-top">
+        <p class="stat-title">Total Aspirasi</p>
+        <div class="stat-icon">✉</div>
+      </div>
+      <h2 class="stat-number" id="total">-</h2>
     </div>
 
-    <div id="announcementList">
-      <p class="empty">Memuat pengumuman...</p>
+    <div class="stat-card orange">
+      <div class="stat-top">
+        <p class="stat-title">Menunggu</p>
+        <div class="stat-icon">◷</div>
+      </div>
+      <h2 class="stat-number" id="waiting">-</h2>
     </div>
+
+    <div class="stat-card purple">
+      <div class="stat-top">
+        <p class="stat-title">Diproses</p>
+        <div class="stat-icon">↻</div>
+      </div>
+      <h2 class="stat-number" id="processed">-</h2>
+    </div>
+
+    <div class="stat-card green">
+      <div class="stat-top">
+        <p class="stat-title">Selesai</p>
+        <div class="stat-icon">✓</div>
+      </div>
+      <h2 class="stat-number" id="completed">-</h2>
+    </div>
+
   </section>
 
-  <!-- PENGATURAN -->
-  <section class="view" id="settingsView">
-    <div class="heading">
-      <h1>Pengaturan</h1>
-      <p>Pengaturan akun admin</p>
+  <!-- CHART AND RECENT -->
+  <section class="panel-grid">
+
+    <div class="panel">
+      <div class="panel-heading">
+        <h2>Statistik Status Aspirasi</h2>
+        <span>Distribusi data</span>
+      </div>
+
+      <div class="chart-list">
+
+        <div class="chart-row">
+          <span class="chart-label">Menunggu</span>
+          <div class="chart-track">
+            <div class="chart-fill" id="barWaiting"
+              style="background:#ffb65e"></div>
+          </div>
+          <span class="chart-value" id="chartWaiting">0</span>
+        </div>
+
+        <div class="chart-row">
+          <span class="chart-label">Dibaca</span>
+          <div class="chart-track">
+            <div class="chart-fill" id="barRead"
+              style="background:#4599ff"></div>
+          </div>
+          <span class="chart-value" id="chartRead">0</span>
+        </div>
+
+        <div class="chart-row">
+          <span class="chart-label">Diproses</span>
+          <div class="chart-track">
+            <div class="chart-fill" id="barProcessed"
+              style="background:#b895ff"></div>
+          </div>
+          <span class="chart-value" id="chartProcessed">0</span>
+        </div>
+
+        <div class="chart-row">
+          <span class="chart-label">Selesai</span>
+          <div class="chart-track">
+            <div class="chart-fill" id="barCompleted"
+              style="background:#39d99a"></div>
+          </div>
+          <span class="chart-value" id="chartCompleted">0</span>
+        </div>
+
+      </div>
     </div>
 
-    <div class="content-card">
-      <h3>Akun administrator</h3>
-      <p>Panel pengelolaan ASPIRASI OSIS.</p>
+    <div class="panel">
+      <div class="panel-heading">
+        <h2>Aspirasi Terbaru</h2>
+        <span>Data terbaru</span>
+      </div>
+
+      <div class="recent-list" id="recentList">
+        <div class="empty">Memuat data aspirasi...</div>
+      </div>
     </div>
 
-    <div class="content-card">
-      <h3>Sesi admin</h3>
-      <p>Sesi login berlaku sesuai pengaturan keamanan server.</p>
-      <br>
-      <button class="link-button" onclick="logout()">Keluar dari akun</button>
+  </section>
+
+  <!-- QUICK MENU -->
+  <section class="panel quick-menu">
+
+    <div class="panel-heading">
+      <h2>Akses Cepat</h2>
+      <span>Pengelolaan sistem</span>
     </div>
+
+    <div class="quick-grid">
+
+      <button class="quick-button"
+        onclick="comingSoon('Data Aspirasi')">
+        <span class="quick-icon">📩</span>
+        <span>
+          <strong>Data Aspirasi</strong>
+          <small>Lihat semua aspirasi</small>
+        </span>
+      </button>
+
+      <button class="quick-button"
+        onclick="comingSoon('Balasan Aspirasi')">
+        <span class="quick-icon">💬</span>
+        <span>
+          <strong>Balasan</strong>
+          <small>Kelola tanggapan</small>
+        </span>
+      </button>
+
+      <button class="quick-button"
+        onclick="comingSoon('Pengumuman')">
+        <span class="quick-icon">📢</span>
+        <span>
+          <strong>Pengumuman</strong>
+          <small>Informasi siswa</small>
+        </span>
+      </button>
+
+      <button class="quick-button"
+        onclick="comingSoon('Pengaturan')">
+        <span class="quick-icon">⚙️</span>
+        <span>
+          <strong>Pengaturan</strong>
+          <small>Kelola akun</small>
+        </span>
+      </button>
+
+    </div>
+
+    <p id="status">Menghubungkan ke server...</p>
+
   </section>
 
 </main>
 
-<nav class="bottom-nav">
-  <button class="nav-button active" data-view="home" onclick="navigate('home')">
-    <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
-    Beranda
-  </button>
+<footer>
+  ASPIRASI — STUDENT VOICE<br>
+  © 2026 OSIS SMAN 1 BATANG HARI LEKO
+</footer>
 
-  <button class="nav-button" data-view="aspirations" onclick="navigate('aspirations')">
-    <i class="ti ti-inbox" aria-hidden="true"></i>
-    Aspirasi
-  </button>
-
-  <button class="nav-button" data-view="info" onclick="navigate('info')">
-    <i class="ti ti-speakerphone" aria-hidden="true"></i>
-    Info
-  </button>
-
-  <button class="nav-button" data-view="settings" onclick="navigate('settings')">
-    <i class="ti ti-settings" aria-hidden="true"></i>
-    Atur
-  </button>
-</nav>
+</div>
+</div>
 
 <script>
 const API_URL =
@@ -620,163 +924,120 @@ const token =
 
 const statusText = document.getElementById("status");
 
-let aspirations = [];
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 
 function logout() {
-  if (!confirm("Yakin ingin keluar?")) return;
+  if (!confirm("Yakin ingin keluar dari dashboard?")) return;
 
   sessionStorage.removeItem("aspirasi_admin_token");
   window.location.href = "index.html";
 }
 
-function showNotifications() {
-  alert("Belum ada pusat notifikasi. Fitur ini akan dikembangkan berikutnya.");
-}
+document.getElementById("logoutButton")
+  .addEventListener("click", logout);
 
-function navigate(view) {
-  document.querySelectorAll(".view").forEach(el => {
-    el.classList.remove("active");
+document.getElementById("menuButton")
+  .addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
   });
 
-  document.querySelectorAll(".nav-button").forEach(el => {
-    el.classList.toggle("active", el.dataset.view === view);
-  });
+overlay.addEventListener("click", closeSidebar);
 
-  const target = document.getElementById(view + "View");
-
-  if (target) target.classList.add("active");
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
+function closeSidebar() {
+  sidebar.classList.remove("open");
+  overlay.classList.remove("show");
 }
 
-function getStatusClass(status) {
-  return String(status || "").toLowerCase();
-}
+function selectMenu(button, name) {
+  document.querySelectorAll(".nav button")
+    .forEach(x => x.classList.remove("active"));
 
-function getInitials(name, anonymous) {
-  if (anonymous) return "AN";
+  button.classList.add("active");
+  closeSidebar();
 
-  if (!name) return "SW";
-
-  return name.trim().split(/\s+/)
-    .slice(0, 2)
-    .map(x => x[0])
-    .join("")
-    .toUpperCase();
-}
-
-function formatTime(value) {
-  if (!value) return "";
-
-  const date = new Date(
-    value.includes("T") ? value : value.replace(" ", "T") + "Z"
-  );
-
-  if (Number.isNaN(date.getTime())) return "";
-
-  const diff = Math.max(0, Date.now() - date.getTime());
-  const minutes = Math.floor(diff / 60000);
-
-  if (minutes < 1) return "Baru saja";
-  if (minutes < 60) return minutes + " menit lalu";
-
-  const hours = Math.floor(minutes / 60);
-
-  if (hours < 24) return hours + " jam lalu";
-
-  const days = Math.floor(hours / 24);
-
-  if (days === 1) return "Kemarin";
-
-  return days + " hari lalu";
-}
-
-function aspirationHTML(item) {
-  const anonymous = Number(item.is_anonymous) === 1;
-  const sender = anonymous ? "Anonim" : (item.sender_name || "Siswa");
-
-  return `
-    <div class="aspiration-item">
-      <div class="avatar">
-        ${getInitials(item.sender_name, anonymous)}
-      </div>
-
-      <div class="aspiration-info">
-        <h3>${escapeHTML(item.title || "Tanpa judul")}</h3>
-        <p>${escapeHTML(sender)} · ${formatTime(item.created_at)}</p>
-      </div>
-
-      <span class="status ${getStatusClass(item.status)}">
-        ${escapeHTML(item.status || "Menunggu")}
-      </span>
-    </div>
-  `;
-}
-
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[char]);
-}
-
-function renderAspirations() {
-  const recent = [...aspirations]
-    .sort((a, b) =>
-      new Date(b.created_at) - new Date(a.created_at)
-    );
-
-  document.getElementById("recentList").innerHTML =
-    recent.length
-      ? recent.slice(0, 3).map(aspirationHTML).join("")
-      : '<p class="empty">Belum ada aspirasi masuk.</p>';
-
-  document.getElementById("allAspirations").innerHTML =
-    recent.length
-      ? recent.map(aspirationHTML).join("")
-      : '<p class="empty">Belum ada aspirasi masuk.</p>';
-}
-
-async function loadAnnouncements() {
-  const target = document.getElementById("announcementList");
-
-  try {
-    const response = await fetch(
-      `${API_URL}/api/admin/announcements`,
-      {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || "Gagal memuat pengumuman.");
-    }
-
-    const items = data.announcements || [];
-
-    target.innerHTML = items.length
-      ? items.map(item => `
-          <div class="content-card">
-            <h3>${escapeHTML(item.title)}</h3>
-            <p>${escapeHTML(item.content)}</p>
-            <span class="status ${Number(item.is_published) === 1 ? "selesai" : "menunggu"}">
-              ${Number(item.is_published) === 1 ? "Dipublikasikan" : "Draft"}
-            </span>
-          </div>
-        `).join("")
-      : '<p class="empty">Belum ada pengumuman.</p>';
-
-  } catch (error) {
-    target.innerHTML =
-      `<p class="empty">${escapeHTML(error.message)}</p>`;
+  if (name !== "Dashboard") {
+    comingSoon(name);
   }
+}
+
+function comingSoon(name) {
+  alert("Menu " + name +
+    " sedang disiapkan pada tahap pengembangan berikutnya.");
+}
+
+function setText(id, value) {
+  document.getElementById(id).textContent = value;
+}
+
+function setBar(id, value, total) {
+  const percent = total > 0
+    ? (value / total) * 100
+    : 0;
+
+  document.getElementById(id).style.width =
+    percent + "%";
+}
+
+function formatDate(value) {
+  if (!value) return "Tanggal tidak tersedia";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function renderRecent(items) {
+  const container = document.getElementById("recentList");
+  container.replaceChildren();
+
+  if (!items.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "Belum ada aspirasi.";
+    container.appendChild(empty);
+    return;
+  }
+
+  items.slice(0, 4).forEach(item => {
+    const row = document.createElement("div");
+    row.className = "recent-item";
+
+    const icon = document.createElement("div");
+    icon.className = "recent-icon";
+    icon.textContent = "✉";
+
+    const info = document.createElement("div");
+    info.className = "recent-info";
+
+    const title = document.createElement("strong");
+    title.textContent = item.title || "Tanpa judul";
+
+    const date = document.createElement("small");
+    date.textContent = formatDate(item.created_at);
+
+    info.append(title, date);
+
+    const badge = document.createElement("span");
+    const status = item.status || "Menunggu";
+
+    badge.className =
+      "status-badge status-" + status;
+
+    badge.textContent = status;
+
+    row.append(icon, info, badge);
+    container.appendChild(row);
+  });
 }
 
 async function loadDashboard() {
@@ -804,17 +1065,22 @@ async function loadDashboard() {
         return;
       }
 
-      throw new Error(data.message || "Gagal mengambil data.");
+      throw new Error(
+        data.message || "Gagal mengambil data."
+      );
     }
 
-    aspirations = data.aspirations || [];
-
+    const aspirations = data.aspirations || [];
     const total = Number(
       data.pagination?.total ?? aspirations.length
     );
 
     const waiting = aspirations.filter(
       x => x.status === "Menunggu"
+    ).length;
+
+    const read = aspirations.filter(
+      x => x.status === "Dibaca"
     ).length;
 
     const processed = aspirations.filter(
@@ -825,27 +1091,27 @@ async function loadDashboard() {
       x => x.status === "Selesai"
     ).length;
 
-    document.getElementById("total").textContent = total;
-    document.getElementById("waiting").textContent = waiting;
-    document.getElementById("processed").textContent = processed;
-    document.getElementById("completed").textContent = completed;
+    setText("total", total);
+    setText("waiting", waiting);
+    setText("processed", processed);
+    setText("completed", completed);
 
-    const percentage = total
-      ? Math.round((completed / total) * 100)
-      : 0;
+    setText("chartWaiting", waiting);
+    setText("chartRead", read);
+    setText("chartProcessed", processed);
+    setText("chartCompleted", completed);
 
-    document.getElementById("progressText").textContent =
-      percentage + "%";
+    const displayedTotal = aspirations.length;
 
-    document.getElementById("progressFill").style.width =
-      percentage + "%";
+    setBar("barWaiting", waiting, displayedTotal);
+    setBar("barRead", read, displayedTotal);
+    setBar("barProcessed", processed, displayedTotal);
+    setBar("barCompleted", completed, displayedTotal);
 
-    renderAspirations();
+    renderRecent(aspirations);
 
     statusText.textContent =
       "Data dashboard berhasil dimuat.";
-
-    loadAnnouncements();
 
   } catch (error) {
     statusText.textContent = error.message;
