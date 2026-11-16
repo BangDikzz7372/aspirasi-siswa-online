@@ -994,7 +994,11 @@ function selectMenu(button, name) {
   button.classList.add("active");
   closeSidebar();
 
-  if (name !== "Dashboard") {
+  if (name === "Dashboard") {
+    window.location.href = "dashboard.html";
+  } else if (name === "Data Aspirasi") {
+    window.location.href = "aspirations.html";
+  } else {
     comingSoon(name);
   }
 }
