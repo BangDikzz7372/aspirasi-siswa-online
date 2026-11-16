@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1424">
+<title>Dashboard Admin — ASPIRASI</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0b1424;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+
+header {
+  background: #14243a;
+  border-bottom: 1px solid #263d5b;
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  font-weight: bold;
+  font-size: 19px;
+  letter-spacing: 1px;
+}
+
+.brand span {
+  color: #4295f5;
+}
+
+.logout {
+  background: #a83242;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+main {
+  width: 100%;
+  max-width: 1100px;
+  padding: 25px 18px;
+  margin: auto;
+}
+
+.welcome {
+  margin-bottom: 25px;
+}
+
+.welcome h1 {
+  font-size: 25px;
+  margin-bottom: 8px;
+}
+
+.welcome p {
+  color: #9db1ca;
+  font-size: 13px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 13px;
+}
+
+.stat-card {
+  background: #14243a;
+  border: 1px solid #263d5b;
+  padding: 20px;
+  border-radius: 13px;
+}
+
+.stat-card p {
+  color: #a8bad0;
+  font-size: 12px;
+}
+
+.stat-card h2 {
+  font-size: 30px;
+  margin-top: 12px;
+}
+
+.stat-card.blue h2 { color: #55a5ff; }
+.stat-card.orange h2 { color: #ffb45d; }
+.stat-card.purple h2 { color: #c29aff; }
+.stat-card.green h2 { color: #69dfa0; }
+
+.section {
+  margin-top: 30px;
+  background: #14243a;
+  border: 1px solid #263d5b;
+  padding: 20px;
+  border-radius: 13px;
+}
+
+.section h2 {
+  font-size: 17px;
+  margin-bottom: 15px;
+}
+
+.menu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.menu button {
+  background: #1b3554;
+  border: 1px solid #315477;
+  color: white;
+  padding: 17px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.menu button:active {
+  background: #28527e;
+}
+
+#status {
+  color: #9db1ca;
+  font-size: 13px;
+  margin-top: 15px;
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  color: #7188a4;
+  font-size: 11px;
+}
+
+@media (min-width: 700px) {
+  .stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .menu {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">ASPIRASI <span>ADMIN</span></div>
+  <button class="logout" id="logoutButton">Logout</button>
+</header>
+
+<main>
+
+  <section class="welcome">
+    <h1>Dashboard</h1>
+    <p>OSIS SMAN 1 BATANG HARI LEKO</p>
+  </section>
+
+  <section class="stats">
+
+    <div class="stat-card blue">
+      <p>Total Aspirasi</p>
+      <h2 id="total">-</h2>
+    </div>
+
+    <div class="stat-card orange">
+      <p>Menunggu</p>
+      <h2 id="waiting">-</h2>
+    </div>
+
+    <div class="stat-card purple">
+      <p>Diproses</p>
+      <h2 id="processed">-</h2>
+    </div>
+
+    <div class="stat-card green">
+      <p>Selesai</p>
+      <h2 id="completed">-</h2>
+    </div>
+
+  </section>
+
+  <section class="section">
+    <h2>Menu Pengelolaan</h2>
+
+    <div class="menu">
+      <button onclick="comingSoon()">📩 Data Aspirasi</button>
+      <button onclick="comingSoon()">💬 Balasan Aspirasi</button>
+      <button onclick="comingSoon()">📢 Pengumuman</button>
+      <button onclick="comingSoon()">⚙️ Pengaturan</button>
+    </div>
+
+    <p id="status">Memuat data dashboard...</p>
+  </section>
+
+</main>
+
+<footer>
+  ASPIRASI — STUDENT VOICE<br>
+  © 2026 OSIS SMAN 1 BATANG HARI LEKO
+</footer>
+
+<script>
+const API_URL =
+  "https://aspirasi-siswa-api.dikaandiyansyah328.workers.dev";
+
+const token =
+  sessionStorage.getItem("aspirasi_admin_token");
+
+const statusText = document.getElementById("status");
+
+function logout() {
+  const confirmed = confirm("Yakin ingin keluar?");
+
+  if (!confirmed) return;
+
+  sessionStorage.removeItem("aspirasi_admin_token");
+  window.location.href = "index.html";
+}
+
+document.getElementById("logoutButton")
+  .addEventListener("click", logout);
+
+function comingSoon() {
+  alert("Fitur ini akan dibuat pada tahap berikutnya.");
+}
+
+async function loadDashboard() {
+  if (!token) {
+    window.location.replace("index.html");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/admin/aspirations?limit=50&page=1`,
+      {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      if (response.status === 401) {
+        sessionStorage.removeItem("aspirasi_admin_token");
+        window.location.replace("index.html");
+        return;
+      }
+
+      throw new Error(
+        data.message || "Gagal mengambil data."
+      );
+    }
+
+    const aspirations = data.aspirations || [];
+    const total = Number(data.pagination?.total ?? aspirations.length);
+
+    document.getElementById("total").textContent = total;
+
+    document.getElementById("waiting").textContent =
+      aspirations.filter(x => x.status === "Menunggu").length;
+
+    document.getElementById("processed").textContent =
+      aspirations.filter(x => x.status === "Diproses").length;
+
+    document.getElementById("completed").textContent =
+      aspirations.filter(x => x.status === "Selesai").length;
+
+    statusText.textContent =
+      "Data dashboard berhasil dimuat.";
+
+  } catch (error) {
+    statusText.textContent = error.message;
+  }
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>
