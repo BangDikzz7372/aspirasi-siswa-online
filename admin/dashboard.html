@@ -1067,42 +1067,227 @@ async function loadDashboard() {
       }
     );
 
-    statusText.textContent = "Menerima respons server...";
+<script>
+"use strict";
+
+const API_URL =
+  "https://aspirasi-siswa-api.dikaandiyansyah328.workers.dev";
+
+const TOKEN_KEY = "aspirasi_admin_token";
+
+const token = sessionStorage.getItem(TOKEN_KEY);
+
+const statusText = document.getElementById("status");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+
+function showStatus(message, type = "normal") {
+  statusText.textContent = message;
+
+  if (type === "success") {
+    statusText.style.color = "#39d99a";
+  } else if (type === "error") {
+    statusText.style.color = "#ff8794";
+  } else {
+    statusText.style.color = "#91a3bb";
+  }
+}
+
+function setText(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.textContent = value;
+}
+
+function setBar(id, value, total) {
+  const element = document.getElementById(id);
+  if (!element) return;
+
+  const percent = total > 0
+    ? Math.min((value / total) * 100, 100)
+    : 0;
+
+  element.style.width = percent + "%";
+}
+
+function closeSidebar() {
+  sidebar.classList.remove("open");
+  overlay.classList.remove("show");
+}
+
+function logout() {
+  if (!confirm("Yakin ingin keluar dari dashboard?")) return;
+
+  sessionStorage.removeItem(TOKEN_KEY);
+  window.location.replace("index.html");
+}
+
+document.getElementById("logoutButton")
+  .addEventListener("click", logout);
+
+document.getElementById("menuButton")
+  .addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
+  });
+
+overlay.addEventListener("click", closeSidebar);
+
+function comingSoon(name) {
+  alert(
+    "Menu " + name +
+    " sedang disiapkan pada tahap pengembangan berikutnya."
+  );
+}
+
+function selectMenu(button, name) {
+  document.querySelectorAll(".nav button")
+    .forEach(item => item.classList.remove("active"));
+
+  button.classList.add("active");
+  closeSidebar();
+
+  if (name !== "Dashboard") {
+    comingSoon(name);
+  }
+}
+
+function formatDate(value) {
+  if (!value) return "Tanggal tidak tersedia";
+
+  const date = new Date(
+    String(value).replace(" ", "T") + "Z"
+  );
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function renderRecent(items) {
+  const container = document.getElementById("recentList");
+  container.replaceChildren();
+
+  if (!items.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "Belum ada aspirasi.";
+    container.appendChild(empty);
+    return;
+  }
+
+  items.slice(0, 4).forEach(item => {
+    const row = document.createElement("div");
+    row.className = "recent-item";
+
+    const icon = document.createElement("div");
+    icon.className = "recent-icon";
+    icon.textContent = "✉";
+
+    const info = document.createElement("div");
+    info.className = "recent-info";
+
+    const title = document.createElement("strong");
+    title.textContent = item.title || "Tanpa judul";
+
+    const date = document.createElement("small");
+    date.textContent = formatDate(item.created_at);
+
+    info.append(title, date);
+
+    const badge = document.createElement("span");
+    const status = item.status || "Menunggu";
+
+    badge.className =
+      "status-badge status-" + status;
+
+    badge.textContent = status;
+
+    row.append(icon, info, badge);
+    container.appendChild(row);
+  });
+}
+
+async function loadDashboard() {
+  if (!token) {
+    showStatus("Token tidak ditemukan. Silakan login ulang.", "error");
+    sessionStorage.removeItem(TOKEN_KEY);
+
+    window.location.replace("index.html");
+    return;
+  }
+
+  showStatus("Memeriksa koneksi server...");
+
+  const controller = new AbortController();
+
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, 15000);
+
+  try {
+    const response = await fetch(
+      API_URL + "/api/admin/aspirations?limit=50&page=1",
+      {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Accept": "application/json"
+        },
+        signal: controller.signal,
+        cache: "no-store"
+      }
+    );
+
+    if (response.status === 401) {
+      sessionStorage.removeItem(TOKEN_KEY);
+
+      showStatus("Sesi admin berakhir. Silakan login kembali.", "error");
+
+      setTimeout(() => {
+        window.location.replace("index.html");
+      }, 1500);
+
+      return;
+    }
 
     const data = await response.json();
 
-    if (!response.ok || !data.success) {
-      if (response.status === 401) {
-        sessionStorage.removeItem("aspirasi_admin_token");
-        statusText.textContent = "Sesi berakhir. Silakan login ulang.";
-        window.location.replace("index.html");
-        return;
-      }
-
+    if (!response.ok || data.success !== true) {
       throw new Error(
-        `HTTP ${response.status}: ${data.message || "Permintaan gagal."}`
+        data.message || "Server menolak permintaan."
       );
     }
 
-    const aspirations = data.aspirations || [];
+    if (!Array.isArray(data.aspirations)) {
+      throw new Error("Format data aspirasi tidak valid.");
+    }
+
+    const aspirations = data.aspirations;
+
     const total = Number(
       data.pagination?.total ?? aspirations.length
     );
 
     const waiting = aspirations.filter(
-      x => x.status === "Menunggu"
+      item => item.status === "Menunggu"
     ).length;
 
     const read = aspirations.filter(
-      x => x.status === "Dibaca"
+      item => item.status === "Dibaca"
     ).length;
 
     const processed = aspirations.filter(
-      x => x.status === "Diproses"
+      item => item.status === "Diproses"
     ).length;
 
     const completed = aspirations.filter(
-      x => x.status === "Selesai"
+      item => item.status === "Selesai"
     ).length;
 
     setText("total", total);
@@ -1124,22 +1309,35 @@ async function loadDashboard() {
 
     renderRecent(aspirations);
 
-    statusText.textContent =
-      `Berhasil! ${total} aspirasi ditemukan.`;
+    showStatus(
+      "Terhubung! " + total + " aspirasi berhasil dimuat.",
+      "success"
+    );
 
   } catch (error) {
-    if (error.name === "AbortError") {
-      statusText.textContent =
-        "TIMEOUT: Server tidak merespons dalam 15 detik.";
-    } else {
-      statusText.textContent =
-        "ERROR: " + error.message;
-    }
+    console.error("ASPIRASI Dashboard:", error);
 
-    console.error("Dashboard error:", error);
+    if (error.name === "AbortError") {
+      showStatus(
+        "TIMEOUT: Server tidak merespons dalam 15 detik.",
+        "error"
+      );
+    } else if (error instanceof TypeError) {
+      showStatus(
+        "Gagal terhubung. Periksa jaringan atau konfigurasi CORS Worker.",
+        "error"
+      );
+    } else {
+      showStatus(
+        "ERROR: " + error.message,
+        "error"
+      );
+    }
 
   } finally {
     clearTimeout(timeout);
   }
 }
-  
+
+loadDashboard();
+</script>
